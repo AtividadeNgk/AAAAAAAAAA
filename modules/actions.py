@@ -330,8 +330,28 @@ async def acessar_planos_mensagem(update: Update, context: CallbackContext):
 async def confirmar_plano(update: Update, context: CallbackContext):
     query = update.callback_query
     
-    # NOVO: Notificação no topo quando escolhe um plano
-    await query.answer("✅ João Silva acabou de comprar este plano!")
+    # DEBUG
+    print("DEBUG - Entrou em confirmar_plano")
+    print(f"DEBUG - Callback data: {query.data}")
+    
+    # NOVO: Verificar e mostrar gatilho se configurado
+    gatilhos = manager.get_bot_gatilhos(context.bot_data['id'])
+    gatilho_escolher_plano = gatilhos.get('escolher_plano')
+    
+    # DEBUG
+    print(f"DEBUG - Todos os gatilhos: {gatilhos}")
+    print(f"DEBUG - Gatilho escolher_plano: {gatilho_escolher_plano}")
+    
+    if gatilho_escolher_plano:
+        show_alert = gatilho_escolher_plano['tipo'] == 'popup'
+        print(f"DEBUG - Tipo: {gatilho_escolher_plano['tipo']}, show_alert: {show_alert}")
+        print(f"DEBUG - Vai mostrar texto: {gatilho_escolher_plano['texto']}")
+        await query.answer(gatilho_escolher_plano['texto'], show_alert=show_alert)
+    else:
+        print("DEBUG - Sem gatilho configurado, answer vazio")
+        await query.answer()
+    
+    print("DEBUG - Passou do answer, continuando...")
     
     plano_index = int(query.data.split('_')[-1])
     planos = manager.get_bot_plans(context.bot_data['id'])
