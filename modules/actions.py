@@ -284,11 +284,19 @@ async def send_invite(context, user_id):
 async def acessar_planos(update: Update, context: CallbackContext):
     query = update.callback_query
     
-    # NOVO: Notificação popup central quando clica em "Ver Ofertas"
-    await query.answer(
-        "🔥 23 pessoas acabaram de garantir o acesso VIP nas últimas 2 horas!",
-        show_alert=True  # Isso faz aparecer o popup central
-    )
+    # NOVO: Verificar e mostrar gatilho se configurado
+    gatilhos = manager.get_bot_gatilhos(context.bot_data['id'])
+    gatilho_ver_ofertas = gatilhos.get('ver_ofertas')
+    
+    # DEBUG: Adicione estes prints
+    print(f"DEBUG - Gatilhos: {gatilhos}")
+    print(f"DEBUG - Gatilho ver_ofertas: {gatilho_ver_ofertas}")
+    
+    if gatilho_ver_ofertas:
+        show_alert = gatilho_ver_ofertas['tipo'] == 'popup'
+        await query.answer(gatilho_ver_ofertas['texto'], show_alert=show_alert)
+    else:
+        await query.answer()
     
     # REMOVIDO O CANCELAMENTO DE RECUPERAÇÕES AQUI
     # Agora só cancela quando o pagamento for confirmado
